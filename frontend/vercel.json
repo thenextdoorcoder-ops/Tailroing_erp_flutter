@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://ecom-tailoring-erp.onrender.com/api/:path*"
+        },
+        {
+            "source": "/uploads/:path*",
+            "destination": "https://ecom-tailoring-erp.onrender.com/uploads/:path*"
+        }
+    ]
+}
