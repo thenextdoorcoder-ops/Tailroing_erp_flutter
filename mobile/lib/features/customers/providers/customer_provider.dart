@@ -39,7 +39,7 @@ class CustomersNotifier extends StateNotifier<AsyncValue<List<CustomerModel>>> {
       );
 
       if (response != null) {
-        final rawList = response is List ? response : (response['customers'] as List? ?? []);
+        final rawList = response is List ? response : (response['data'] as List? ?? response['customers'] as List? ?? []);
         final customers = rawList.map((e) => CustomerModel.fromJson(e)).toList();
 
         if (_searchQuery.isEmpty) {

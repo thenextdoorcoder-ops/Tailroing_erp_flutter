@@ -15,11 +15,31 @@ class CustomersListScreen extends ConsumerStatefulWidget {
   const CustomersListScreen({super.key});
 
   @override
-  ConsumerState<CustomersListScreen> createState() => _CustomersListScreenState();
+  ConsumerState<CustomersListScreen> createState() =>
+      _CustomersListScreenState();
 }
 
 class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
   final TextEditingController _searchController = TextEditingController();
+
+  static final List<Color> _avatarPalette = [
+    const Color(0xFF4E78F0), // Darzee Blue
+    const Color(0xFFEC6689), // Coral Rose
+    const Color(0xFF8B5CF6), // Royal Purple
+    const Color(0xFF01C853), // Emerald Green
+    const Color(0xFFF9A242), // Saffron Amber
+    const Color(0xFF0EA5E9), // Sky Cyan
+    const Color(0xFFE11D48), // Ruby Red
+    const Color(0xFF10B981), // Teal Green
+    const Color(0xFFD97706), // Golden Amber
+    const Color(0xFF6366F1), // Indigo
+  ];
+
+  Color _getCustomerColor(String name) {
+    if (name.isEmpty) return _avatarPalette[0];
+    final hash = name.codeUnits.fold<int>(0, (prev, elem) => prev + elem);
+    return _avatarPalette[hash % _avatarPalette.length];
+  }
 
   @override
   void dispose() {
@@ -28,7 +48,9 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
   }
 
   void _onSearch(String query) {
-    ref.read(customersListProvider.notifier).loadCustomers(search: query.trim());
+    ref
+        .read(customersListProvider.notifier)
+        .loadCustomers(search: query.trim());
   }
 
   Future<void> _callCustomer(String phone) async {
@@ -45,7 +67,7 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Clients & Customers'),
+        title: const Text('Customers'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
@@ -54,7 +76,7 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
               controller: _searchController,
               onChanged: _onSearch,
               decoration: InputDecoration(
-                hintText: 'Search client by name, mobile, city...',
+                hintText: 'Search customer by name, mobile, city...',
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -65,9 +87,11 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
                         },
                       )
                     : null,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 filled: true,
-                fillColor: isDark ? AppColors.surfaceDark : Colors.grey.shade100,
+                fillColor:
+                    isDark ? AppColors.surfaceDark : Colors.grey.shade100,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -97,12 +121,15 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                      const Icon(Icons.error_outline,
+                          size: 48, color: AppColors.error),
                       const SizedBox(height: 12),
                       Text(error.toString(), textAlign: TextAlign.center),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => ref.read(customersListProvider.notifier).loadCustomers(),
+                        onPressed: () => ref
+                            .read(customersListProvider.notifier)
+                            .loadCustomers(),
                         child: const Text('Retry'),
                       ),
                     ],
@@ -113,11 +140,11 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
                 if (customers.isEmpty) {
                   return EmptyState(
                     icon: Icons.people_outline,
-                    title: 'No Clients Found',
+                    title: 'No Customers Found',
                     message: _searchController.text.isNotEmpty
-                        ? 'No client matched "${_searchController.text}"'
+                        ? 'No customer matched "${_searchController.text}"'
                         : 'Add your first customer to start tracking tailoring orders & measurements.',
-                    actionText: 'Add Client',
+                    actionText: 'Add Customer',
                     onAction: () => context.push('/customers/new'),
                   );
                 }
@@ -128,110 +155,120 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (ctx, index) {
                     final customer = customers[index];
+                    final avatarColor = _getCustomerColor(customer.name);
 
                     return AnimatedListItem(
                       index: index,
                       child: AppCard(
-                      accentColor: AppColors.primary,
-                      hasAccentBorder: true,
-                      padding: const EdgeInsets.all(14),
-                      borderRadius: 18,
-                      onTap: () => context.push('/customers/${customer.id}'),
-                      child: Row(
-                        children: [
-                          // Gradient ring avatar
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary.withValues(alpha: 0.15),
-                                  AppColors.primaryLight.withValues(alpha: 0.08),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: AppColors.primary.withValues(alpha: 0.25),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                customer.initials,
-                                style: TextStyle(
-                                  color: isDark ? AppColors.primaryLight : AppColors.primary,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 16,
+                        accentColor: avatarColor,
+                        hasAccentBorder: true,
+                        padding: const EdgeInsets.all(14),
+                        borderRadius: 18,
+                        onTap: () => context.push('/customers/${customer.id}'),
+                        child: Row(
+                          children: [
+                            // Gradient ring avatar
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    avatarColor.withValues(alpha: 0.18),
+                                    avatarColor.withValues(alpha: 0.06),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                border: Border.all(
+                                  color: avatarColor.withValues(alpha: 0.35),
+                                  width: 1.5,
                                 ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-
-                          // Customer Info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  customer.name,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  customer.mobile,
+                              child: Center(
+                                child: Text(
+                                  customer.initials,
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: isDark
-                                        ? AppColors.textSecondaryDark
-                                        : AppColors.textSecondaryLight,
+                                    color: avatarColor,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
                                   ),
                                 ),
-                                if (customer.city != null && customer.city!.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 2),
-                                    child: Text(
-                                      customer.city!,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: isDark
-                                            ? AppColors.textMutedDark
-                                            : AppColors.textMutedLight,
-                                      ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+
+                            // Customer Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    customer.name,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    customer.mobile,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: isDark
+                                          ? AppColors.textSecondaryDark
+                                          : AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                  if (customer.city != null &&
+                                      customer.city!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Text(
+                                        customer.city!,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: isDark
+                                              ? AppColors.textMutedDark
+                                              : AppColors.textMutedLight,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+
+                            // Actions: WhatsApp & Call
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                      Icons.chat_bubble_outline_rounded,
+                                      color: Color(0xFF25D366),
+                                      size: 20),
+                                  tooltip: 'WhatsApp',
+                                  onPressed: () {
+                                    WhatsAppService.sendMessage(
+                                      phone: customer.mobile,
+                                      message:
+                                          'Hello ${customer.name}, greetings from KTown Aari Works! 👗✨',
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.phone_outlined,
+                                      color: AppColors.success, size: 20),
+                                  tooltip: 'Call Customer',
+                                  onPressed: () =>
+                                      _callCustomer(customer.mobile),
+                                ),
                               ],
                             ),
-                          ),
-
-                          // Actions: WhatsApp & Call
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF25D366), size: 20),
-                                tooltip: 'WhatsApp',
-                                onPressed: () {
-                                  WhatsAppService.sendMessage(
-                                    phone: customer.mobile,
-                                    message: 'Hello ${customer.name}, greetings from KTown Aari Works! 👗✨',
-                                  );
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.phone_outlined, color: AppColors.success, size: 20),
-                                tooltip: 'Call Client',
-                                onPressed: () => _callCustomer(customer.mobile),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                     );
                   },
                 );
@@ -262,10 +299,12 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
           hoverElevation: 0,
           focusElevation: 0,
           highlightElevation: 0,
-          icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white, size: 20),
+          icon: const Icon(Icons.person_add_alt_1_rounded,
+              color: Colors.white, size: 20),
           label: const Text(
-            'Add Client',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+            'Add Customer',
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
           ),
         ),
       ),

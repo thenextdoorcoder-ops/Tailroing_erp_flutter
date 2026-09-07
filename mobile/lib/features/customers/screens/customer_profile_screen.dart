@@ -10,6 +10,7 @@ import '../../../shared/models/customer_model.dart';
 import '../../../shared/models/order_model.dart';
 import '../../../shared/models/measurement_model.dart';
 import '../../../shared/widgets/status_badge.dart';
+import '../../../shared/widgets/loading_shimmer.dart';
 
 class CustomerProfileScreen extends ConsumerStatefulWidget {
   final String customerId;
@@ -26,6 +27,25 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> w
   List<OrderModel> _orders = [];
   List<MeasurementModel> _measurements = [];
   bool _isLoading = true;
+
+  static final List<Color> _avatarPalette = [
+    const Color(0xFF4E78F0), // Darzee Blue
+    const Color(0xFFEC6689), // Coral Rose
+    const Color(0xFF8B5CF6), // Royal Purple
+    const Color(0xFF01C853), // Emerald Green
+    const Color(0xFFF9A242), // Saffron Amber
+    const Color(0xFF0EA5E9), // Sky Cyan
+    const Color(0xFFE11D48), // Ruby Red
+    const Color(0xFF10B981), // Teal Green
+    const Color(0xFFD97706), // Golden Amber
+    const Color(0xFF6366F1), // Indigo
+  ];
+
+  Color _getCustomerColor(String name) {
+    if (name.isEmpty) return _avatarPalette[0];
+    final hash = name.codeUnits.fold<int>(0, (prev, elem) => prev + elem);
+    return _avatarPalette[hash % _avatarPalette.length];
+  }
 
   @override
   void initState() {
@@ -80,7 +100,16 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> w
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Customer Profile')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              LoadingShimmer(count: 1, height: 110),
+              SizedBox(height: 16),
+              LoadingShimmer(count: 4, height: 70),
+            ],
+          ),
+        ),
       );
     }
 
@@ -92,6 +121,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> w
     }
 
     final cust = _customer!;
+    final custColor = _getCustomerColor(cust.name);
 
     return Scaffold(
       appBar: AppBar(
@@ -112,22 +142,46 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> w
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDark ? AppColors.cardDark : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: isDark ? AppColors.borderDark : AppColors.borderLight,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                  child: Text(
-                    cust.initials,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        custColor.withValues(alpha: 0.20),
+                        custColor.withValues(alpha: 0.07),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    border: Border.all(
+                      color: custColor.withValues(alpha: 0.35),
+                      width: 1.8,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      cust.initials,
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w800,
+                        color: custColor,
+                      ),
                     ),
                   ),
                 ),

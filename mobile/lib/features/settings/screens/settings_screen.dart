@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/api_endpoints.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../../shared/widgets/premium_snackbar.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -46,8 +47,9 @@ class SettingsScreen extends ConsumerWidget {
               await SecureStorageService.saveBaseUrl(newUrl);
               if (ctx.mounted) Navigator.pop(ctx);
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Server URL saved!')),
+                PremiumSnackbar.showSuccess(
+                  context,
+                  'Server URL saved successfully!',
                 );
               }
             },
@@ -175,40 +177,24 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
 
-          // Quick Navigation
-          const Text('Quick Navigation', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          // Studio & Hardware Configuration
+          const Text('Studio & Hardware Configuration', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Card(
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.people_outline, color: AppColors.accent),
-                  title: const Text('Attenders & Referrals'),
-                  subtitle: const Text('Track referral sources'),
+                  leading: const Icon(Icons.checkroom_rounded, color: AppColors.primary),
+                  title: const Text('Services & Garment Pricing', style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text('Configure stitching rates for Blouse, Chudi, Pant & custom garments'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/attenders'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.school_outlined, color: AppColors.secondary),
-                  title: const Text('Students & Courses'),
-                  subtitle: const Text('Manage course enrollments'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/students'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_outlined, color: AppColors.primary),
-                  title: const Text('Gallery'),
-                  subtitle: const Text('Shop portfolio & blouse catalog'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/gallery'),
+                  onTap: () => context.push('/services-pricing'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.print_outlined, color: AppColors.warning),
-                  title: const Text('Bluetooth Thermal Printer'),
-                  subtitle: const Text('Connect 58mm/80mm receipt & label printer'),
+                  title: const Text('Bluetooth Thermal Printer', style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text('Connect 58mm/80mm receipt & barcode label printer'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/printer-settings'),
                 ),

@@ -159,7 +159,7 @@ class _MeasurementHistoryModalState extends ConsumerState<MeasurementHistoryModa
                         ? const EmptyState(
                             icon: Icons.straighten_rounded,
                             title: 'No Measurements Found',
-                            message: 'No recorded measurement history for this client yet.',
+                            message: 'No recorded measurement history for this customer yet.',
                           )
                         : _buildHistoryContent(isDark),
           ),

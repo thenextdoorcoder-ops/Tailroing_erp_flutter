@@ -8,6 +8,8 @@ import '../../core/services/haptic_service.dart';
 import '../../features/workboard/providers/workboard_provider.dart';
 import '../models/order_model.dart';
 import 'custom_button.dart';
+import 'bottom_sheet_handle.dart';
+import 'premium_snackbar.dart';
 
 /// Luxury Boutique Staff & Tailor Work Assignment Modal
 class StaffAssignmentModal extends ConsumerStatefulWidget {
@@ -105,11 +107,9 @@ class _StaffAssignmentModalState extends ConsumerState<StaffAssignmentModal> {
 
       if (mounted) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: AppColors.success,
-            content: Text('Assigned Order #${widget.order.orderId} to $workerName (${_selectedWorkType.toLowerCase()})! ✨'),
-          ),
+        PremiumSnackbar.showSuccess(
+          context,
+          'Assigned Order #${widget.order.orderId} to $workerName (${_selectedWorkType.toLowerCase()})! ✨',
         );
       }
     } catch (e) {
@@ -146,17 +146,7 @@ class _StaffAssignmentModalState extends ConsumerState<StaffAssignmentModal> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+            const BottomSheetHandle(margin: EdgeInsets.only(bottom: 16)),
 
             // Header
             Row(
@@ -171,7 +161,7 @@ class _StaffAssignmentModalState extends ConsumerState<StaffAssignmentModal> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Order #${widget.order.orderId} • ${widget.order.customer?.name ?? "Client"}',
+                      'Order #${widget.order.orderId} • ${widget.order.customer?.name ?? "Customer"}',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

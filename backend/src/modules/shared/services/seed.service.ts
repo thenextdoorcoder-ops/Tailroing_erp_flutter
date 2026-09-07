@@ -61,8 +61,9 @@ export const seedService = {
                 },
             });
 
+            let categoryId = existing?.id;
             if (!existing) {
-                await prisma.category.create({
+                const created = await prisma.category.create({
                     data: {
                         name: cat.name,
                         measurementType: cat.measurementType,
@@ -76,6 +77,58 @@ export const seedService = {
                         },
                     },
                 });
+                categoryId = created.id;
+            }
+
+            // Seed default tailoring service products for this category
+            if (categoryId) {
+                const productCount = await prisma.product.count({
+                    where: { categoryId, userId, deletedAt: null }
+                });
+                if (productCount === 0) {
+                    let items: { name: string; price: number; desc: string }[] = [];
+                    if (cat.name.toLowerCase().includes('blouse')) {
+                        items = [
+                            { name: 'Simple Plain Blouse', price: 350, desc: 'Regular plain stitching' },
+                            { name: 'Lining Blouse Stitching', price: 550, desc: 'Lining blouse with perfect cut' },
+                            { name: 'Princess Cut Blouse', price: 650, desc: 'Princess cut designer style' },
+                            { name: 'Bridal / Padded Blouse', price: 1200, desc: 'Heavy bridal blouse with padding' },
+                        ];
+                    } else if (cat.name.toLowerCase().includes('chudi')) {
+                        items = [
+                            { name: 'Simple Salwar Suit / Kurti', price: 450, desc: 'Daily wear kurti stitching' },
+                            { name: 'Lining Chudi / Salwar Set', price: 800, desc: 'Complete salwar suit with lining' },
+                            { name: 'Anarkali Suit / Gown', price: 1400, desc: 'Designer flare anarkali suit' },
+                        ];
+                    } else if (cat.name.toLowerCase().includes('pant')) {
+                        items = [
+                            { name: 'Straight Cut Pant', price: 400, desc: 'Straight fit ladies pant' },
+                            { name: 'Pattiyaala Pant', price: 450, desc: 'Traditional pleated pant' },
+                            { name: 'Cigarette Pant with Pocket', price: 500, desc: 'Slim fit pant with pocket' },
+                        ];
+                    } else if (cat.name.toLowerCase().includes('kids')) {
+                        items = [
+                            { name: 'Kids Frock Stitching', price: 450, desc: 'Custom kids frock stitching' },
+                            { name: 'Pattu Pavadai Set', price: 800, desc: 'Silk skirt and blouse for kids' },
+                        ];
+                    } else {
+                        items = [
+                            { name: `${cat.name} Standard Stitching`, price: 500, desc: 'Standard custom stitching' },
+                        ];
+                    }
+
+                    for (const item of items) {
+                        await prisma.product.create({
+                            data: {
+                                name: item.name,
+                                categoryId,
+                                sellingPrice: item.price,
+                                description: item.desc,
+                                userId,
+                            }
+                        });
+                    }
+                }
             }
         }
     },

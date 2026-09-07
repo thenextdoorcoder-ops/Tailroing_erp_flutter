@@ -9,6 +9,8 @@ import '../../../shared/widgets/loading_shimmer.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../../shared/widgets/bottom_sheet_handle.dart';
+import '../../../shared/widgets/premium_snackbar.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
@@ -78,6 +80,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> with SingleTi
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const BottomSheetHandle(margin: EdgeInsets.only(bottom: 14)),
               const Text('Add Raw Material / Fabric', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(height: 14),
               CustomTextField(
@@ -181,6 +184,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> with SingleTi
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const BottomSheetHandle(margin: EdgeInsets.only(bottom: 14)),
             Text('Quick Restock: ${item.name}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
             Text('Current Stock: ${item.stockQuantity} ${item.unitSymbol ?? "units"}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
@@ -207,9 +211,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> with SingleTi
                   );
                   _fetchInventory();
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Added +$addQty to ${item.name}'), backgroundColor: AppColors.success),
-                    );
+                    PremiumSnackbar.showSuccess(context, 'Added +$addQty to ${item.name}');
                   }
                 } catch (_) {}
               },

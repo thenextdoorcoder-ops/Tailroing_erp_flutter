@@ -11,6 +11,8 @@ import '../../features/dashboard/providers/dashboard_provider.dart';
 import '../../features/workboard/providers/workboard_provider.dart';
 import '../models/order_model.dart';
 import 'custom_button.dart';
+import 'bottom_sheet_handle.dart';
+import 'premium_snackbar.dart';
 
 /// Luxury Boutique Partial Payment & Balance Collection Sheet
 class PaymentCollectionModal extends ConsumerStatefulWidget {
@@ -111,34 +113,29 @@ class _PaymentCollectionModalState extends ConsumerState<PaymentCollectionModal>
         final remainingBalance = (widget.order.balanceDue - rawAmount).clamp(0.0, double.infinity);
         Navigator.pop(context, true);
 
-        // Show celebration snackbar with WhatsApp receipt action
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: AppColors.success,
-            content: Text('Payment of ₹${rawAmount.toStringAsFixed(0)} recorded successfully! ✨'),
-            action: widget.order.customer?.mobile != null
-                ? SnackBarAction(
-                    label: 'Send WhatsApp Receipt',
-                    textColor: Colors.white,
-                    onPressed: () {
-                      final msg = '🧾 *Payment Receipt - KTown Aari Works*\n'
-                          '───────────────────────\n'
-                          '• Order: #${widget.order.orderId}\n'
-                          '• Client: ${widget.order.customer!.name}\n'
-                          '• Amount Received: ₹${rawAmount.toStringAsFixed(0)} ($_paymentMethod)\n'
-                          '• Remaining Balance: ₹${remainingBalance.toStringAsFixed(0)}\n'
-                          '• Date: ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now())}\n'
-                          '───────────────────────\n'
-                          'Thank you for your business! 🙏';
+        final hasMobile = widget.order.customer?.mobile != null && widget.order.customer!.mobile.isNotEmpty;
+        PremiumSnackbar.showSuccess(
+          context,
+          'Payment of ₹${rawAmount.toStringAsFixed(0)} recorded successfully! ✨',
+          actionLabel: hasMobile ? 'WhatsApp Receipt' : null,
+          onAction: hasMobile
+              ? () {
+                  final msg = '🧾 *Payment Receipt - KTown Aari Works*\n'
+                      '───────────────────────\n'
+                      '• Order: #${widget.order.orderId}\n'
+                      '• Customer: ${widget.order.customer!.name}\n'
+                      '• Amount Received: ₹${rawAmount.toStringAsFixed(0)} ($_paymentMethod)\n'
+                      '• Remaining Balance: ₹${remainingBalance.toStringAsFixed(0)}\n'
+                      '• Date: ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now())}\n'
+                      '───────────────────────\n'
+                      'Thank you for your business! 🙏';
 
-                      WhatsAppService.sendMessage(
-                        phone: widget.order.customer!.mobile,
-                        message: msg,
-                      );
-                    },
-                  )
-                : null,
-          ),
+                  WhatsAppService.sendMessage(
+                    phone: widget.order.customer!.mobile,
+                    message: msg,
+                  );
+                }
+              : null,
         );
       }
     } catch (e) {
@@ -183,17 +180,9 @@ class _PaymentCollectionModalState extends ConsumerState<PaymentCollectionModal>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+            const BottomSheetHandle(
+              margin: EdgeInsets.only(bottom: 16),
             ),
-            const SizedBox(height: 16),
 
             // Header
             Row(
@@ -208,7 +197,7 @@ class _PaymentCollectionModalState extends ConsumerState<PaymentCollectionModal>
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Order #${widget.order.orderId} • ${widget.order.customer?.name ?? "Client"}',
+                      'Order #${widget.order.orderId} • ${widget.order.customer?.name ?? "Customer"}',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

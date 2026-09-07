@@ -11,6 +11,7 @@ import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/loading_shimmer.dart';
 import '../../../shared/widgets/barcode_scanner_modal.dart';
 import '../../../shared/widgets/animated_list_item.dart';
+import '../../../shared/widgets/animated_counter.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/dashboard_provider.dart';
 
@@ -23,10 +24,12 @@ class DashboardScreen extends ConsumerWidget {
     final dashboardState = ref.watch(dashboardProvider);
     final user = authState.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final currencyFormatter = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
+    final currencyFormatter =
+        NumberFormat.currency(symbol: '₹', decimalDigits: 0);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor:
+          isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -65,7 +68,8 @@ class DashboardScreen extends ConsumerWidget {
                             color: AppColors.error.withValues(alpha: 0.10),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.wifi_off_rounded, size: 36, color: AppColors.error),
+                          child: const Icon(Icons.wifi_off_rounded,
+                              size: 36, color: AppColors.error),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -73,7 +77,8 @@ class DashboardScreen extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
-                            color: isDark ? Colors.white : AppColors.primaryDark,
+                            color:
+                                isDark ? Colors.white : AppColors.primaryDark,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -81,13 +86,16 @@ class DashboardScreen extends ConsumerWidget {
                           error.toString(),
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                            color: isDark
+                                ? AppColors.textMutedDark
+                                : AppColors.textMutedLight,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 18),
                         ElevatedButton.icon(
-                          onPressed: () => ref.read(dashboardProvider.notifier).refresh(),
+                          onPressed: () =>
+                              ref.read(dashboardProvider.notifier).refresh(),
                           icon: const Icon(Icons.refresh_rounded, size: 18),
                           label: const Text('Retry'),
                         ),
@@ -115,7 +123,8 @@ class DashboardScreen extends ConsumerWidget {
                             const SizedBox(height: 14),
 
                             // 3. Consolidated Studio Financial & Operations Summary (Single unified card)
-                            _buildStudioSummaryCard(context, data, isDark, currencyFormatter),
+                            _buildStudioSummaryCard(
+                                context, data, isDark, currencyFormatter),
                             const SizedBox(height: 18),
 
                             // 4. Production Workflow Pipeline (Live stage counts)
@@ -123,10 +132,12 @@ class DashboardScreen extends ConsumerWidget {
                             const SizedBox(height: 18),
 
                             // 5. Overdue Deliveries Section (if any)
-                            _buildOverdueSection(context, data, user, isDark, currencyFormatter),
+                            _buildOverdueSection(
+                                context, data, user, isDark, currencyFormatter),
 
                             // 6. Recent Client Orders (Clean editorial list with inspiring empty state)
-                            _buildRecentOrdersSection(context, data, user, isDark, currencyFormatter),
+                            _buildRecentOrdersSection(
+                                context, data, user, isDark, currencyFormatter),
                           ]),
                         ),
                       ),
@@ -146,9 +157,10 @@ class DashboardScreen extends ConsumerWidget {
     final now = DateTime.now();
     final greeting = _getGreeting(now.hour);
     final shopName = user?.shopName ?? 'KTown Aari Works';
-    final userInitial = (user != null && user.firstName != null && user.firstName.isNotEmpty)
-        ? user.firstName[0].toUpperCase()
-        : 'K';
+    final userInitial =
+        (user != null && user.firstName != null && user.firstName.isNotEmpty)
+            ? user.firstName[0].toUpperCase()
+            : 'K';
 
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 8),
@@ -200,14 +212,17 @@ class DashboardScreen extends ConsumerWidget {
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.3,
-                                color: isDark ? Colors.white : AppColors.primaryDark,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.primaryDark,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1.5),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(5),
@@ -230,7 +245,9 @@ class DashboardScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -287,7 +304,7 @@ class DashboardScreen extends ConsumerWidget {
         'route': '/orders/new',
       },
       {
-        'title': 'Add Client',
+        'title': 'Add Customer',
         'icon': Icons.person_add_alt_rounded,
         'color': AppColors.secondary,
         'bg': AppColors.secondary.withValues(alpha: 0.10),
@@ -316,7 +333,8 @@ class DashboardScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
+            color:
+                const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -367,218 +385,270 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   // ─────────────── 3. Consolidated Studio Financial & Operations Summary ───────────────
-  Widget _buildStudioSummaryCard(
-      BuildContext context, DashboardData data, bool isDark, NumberFormat currency) {
+  Widget _buildStudioSummaryCard(BuildContext context, DashboardData data,
+      bool isDark, NumberFormat currency) {
     final todayOrders = data.totalOrdersToday;
     final todayRev = data.revenueToday;
     final balanceDue = data.balanceDueTotal;
     final inProduction = data.activeOrdersCount;
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? AppColors.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
+            color:
+                const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top Banner: Today's Revenue & Total Orders
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Gradient accent bar at top
+            Container(
+              height: 3.5,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary,
+                    Color(0xFF8B5CF6),
+                    AppColors.secondary,
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "TODAY'S OVERVIEW",
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
-                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    currency.format(todayRev),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                      color: isDark ? Colors.white : AppColors.primaryDark,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    todayRev == 0 ? 'Advance collections will appear here' : 'Advance received today',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.success,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Orders Pill
-              GestureDetector(
-                onTap: () => context.push('/orders'),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
+                  // Top Banner: Today's Revenue & Total Orders
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        '$todayOrders',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "TODAY'S OVERVIEW",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                              color: isDark
+                                  ? AppColors.textMutedDark
+                                  : AppColors.textMutedLight,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          AnimatedCurrencyCounter(
+                            value: todayRev,
+                            symbol: '₹',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.5,
+                              color: isDark ? Colors.white : AppColors.primaryDark,
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          Text(
+                            todayRev == 0
+                                ? 'Advance collections will appear here'
+                                : 'Advance received today',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.success,
+                            ),
+                          ),
+                        ],
                       ),
-                      const Text(
-                        'Orders',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+
+                      // Orders Pill
+                      GestureDetector(
+                        onTap: () => context.push('/orders'),
+                        child: Container(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              AnimatedCounter(
+                                value: todayOrders,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const Text(
+                                'Orders',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ],
-          ),
 
-          const SizedBox(height: 14),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
-          ),
-          const SizedBox(height: 12),
-
-          // Bottom Metrics: Balance Due & In Production
-          Row(
-            children: [
-              // Balance Due
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => context.push('/orders'),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF141B2D) : AppColors.cardTintLight,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: AppColors.warning.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.hourglass_top_rounded, color: AppColors.warning, size: 16),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Balance Due',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                                ),
-                              ),
-                              const SizedBox(height: 1),
-                              Text(
-                                currency.format(balanceDue),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: isDark ? Colors.white : AppColors.textPrimaryLight,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 14),
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
                   ),
-                ),
-              ),
-              const SizedBox(width: 10),
+                  const SizedBox(height: 12),
 
-              // In Production
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => context.push('/workboard'),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF141B2D) : AppColors.cardTintLight,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.precision_manufacturing_rounded, color: Color(0xFF8B5CF6), size: 16),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'In Production',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                  // Bottom Metrics: Balance Due & In Production
+                  Row(
+                    children: [
+                      // Balance Due
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => context.push('/orders'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF141B2D)
+                                  : AppColors.cardTintLight,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.warning.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.hourglass_top_rounded,
+                                      color: AppColors.warning, size: 16),
                                 ),
-                              ),
-                              const SizedBox(height: 1),
-                              Text(
-                                '$inProduction active',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: isDark ? Colors.white : AppColors.textPrimaryLight,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Balance Due',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark
+                                              ? AppColors.textMutedDark
+                                              : AppColors.textMutedLight,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 1),
+                                      AnimatedCurrencyCounter(
+                                        value: balanceDue,
+                                        symbol: '₹',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark
+                                              ? Colors.white
+                                              : AppColors.textPrimaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 10),
+
+                      // In Production
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => context.push('/workboard'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF141B2D)
+                                  : AppColors.cardTintLight,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                      Icons.precision_manufacturing_rounded,
+                                      color: Color(0xFF8B5CF6),
+                                      size: 16),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'In Production',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark
+                                              ? AppColors.textMutedDark
+                                              : AppColors.textMutedLight,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 1),
+                                      AnimatedCounter(
+                                        value: inProduction,
+                                        suffix: ' active',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark
+                                              ? Colors.white
+                                              : AppColors.textPrimaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -652,7 +722,8 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                   ),
                   SizedBox(width: 2),
-                  Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+                  Icon(Icons.chevron_right_rounded,
+                      size: 16, color: AppColors.primary),
                 ],
               ),
             ),
@@ -678,13 +749,15 @@ class DashboardScreen extends ConsumerWidget {
                 },
                 child: Container(
                   width: 114,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.cardDark : Colors.white,
                     borderRadius: BorderRadius.circular(13),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF263238).withValues(alpha: isDark ? 0.15 : 0.03),
+                        color: const Color(0xFF263238)
+                            .withValues(alpha: isDark ? 0.15 : 0.03),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -699,7 +772,8 @@ class DashboardScreen extends ConsumerWidget {
                           color: color.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(stage['icon'] as IconData, color: color, size: 15),
+                        child: Icon(stage['icon'] as IconData,
+                            color: color, size: 15),
                       ),
                       const SizedBox(width: 7),
                       Expanded(
@@ -712,7 +786,9 @@ class DashboardScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                color: isDark
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimaryLight,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -722,7 +798,11 @@ class DashboardScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w700,
-                                color: count > 0 ? color : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                                color: count > 0
+                                    ? color
+                                    : (isDark
+                                        ? AppColors.textMutedDark
+                                        : AppColors.textMutedLight),
                               ),
                             ),
                           ],
@@ -752,7 +832,8 @@ class DashboardScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(left: 2, bottom: 8),
           child: Row(
             children: [
-              const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 16),
+              const Icon(Icons.error_outline_rounded,
+                  color: AppColors.error, size: 16),
               const SizedBox(width: 6),
               Text(
                 'Urgent / Overdue Deliveries',
@@ -801,13 +882,16 @@ class DashboardScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: isDark ? Colors.white : AppColors.textPrimaryLight,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textPrimaryLight,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1.5),
                             decoration: BoxDecoration(
                               color: AppColors.error.withValues(alpha: 0.10),
                               borderRadius: BorderRadius.circular(5),
@@ -828,7 +912,9 @@ class DashboardScreen extends ConsumerWidget {
                         '#${order.orderId.substring(0, order.orderId.length > 8 ? 8 : order.orderId.length).toUpperCase()} • Due: ${_formatDueDate(order.dueDate)}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                          color: isDark
+                              ? AppColors.textMutedDark
+                              : AppColors.textMutedLight,
                         ),
                       ),
                     ],
@@ -884,7 +970,8 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     SizedBox(width: 2),
-                    Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 16, color: AppColors.primary),
                   ],
                 ),
               ),
@@ -900,7 +987,8 @@ class DashboardScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
+                  color: const Color(0xFF263238)
+                      .withValues(alpha: isDark ? 0.20 : 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -919,7 +1007,8 @@ class DashboardScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Center(
-                        child: Icon(Icons.checkroom_rounded, color: AppColors.primary, size: 24),
+                        child: Icon(Icons.checkroom_rounded,
+                            color: AppColors.primary, size: 24),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -932,7 +1021,8 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white : AppColors.primaryDark,
+                              color:
+                                  isDark ? Colors.white : AppColors.primaryDark,
                             ),
                           ),
                           const SizedBox(height: 3),
@@ -941,7 +1031,9 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 12,
                               height: 1.35,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondaryLight,
                             ),
                           ),
                         ],
@@ -961,7 +1053,8 @@ class DashboardScreen extends ConsumerWidget {
                     icon: const Icon(Icons.add_rounded, size: 17),
                     label: const Text(
                       'Create First Order',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -986,7 +1079,8 @@ class DashboardScreen extends ConsumerWidget {
               final order = recentOrders[i];
               return AnimatedListItem(
                 index: i,
-                child: _buildVisualOrderCard(context, order, user, isDark, currency),
+                child: _buildVisualOrderCard(
+                    context, order, user, isDark, currency),
               );
             },
           ),
@@ -994,10 +1088,12 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildVisualOrderCard(BuildContext context, OrderModel order, dynamic user,
-      bool isDark, NumberFormat currency) {
+  Widget _buildVisualOrderCard(BuildContext context, OrderModel order,
+      dynamic user, bool isDark, NumberFormat currency) {
     final clientName = order.customer?.name ?? 'Bespoke Client';
-    final shortId = order.orderId.length > 8 ? order.orderId.substring(0, 8).toUpperCase() : order.orderId.toUpperCase();
+    final shortId = order.orderId.length > 8
+        ? order.orderId.substring(0, 8).toUpperCase()
+        : order.orderId.toUpperCase();
     final isPaid = order.balanceDue <= 0;
 
     return GestureDetector(
@@ -1012,7 +1108,8 @@ class DashboardScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF263238).withValues(alpha: isDark ? 0.20 : 0.04),
+              color: const Color(0xFF263238)
+                  .withValues(alpha: isDark ? 0.20 : 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -1038,7 +1135,9 @@ class DashboardScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
-                                color: isDark ? Colors.white : AppColors.textPrimaryLight,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textPrimaryLight,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1051,7 +1150,9 @@ class DashboardScreen extends ConsumerWidget {
                         '#$shortId • ${_getGarmentSubtitle(order)}',
                         style: TextStyle(
                           fontSize: 11.5,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1061,7 +1162,9 @@ class DashboardScreen extends ConsumerWidget {
                           Icon(
                             Icons.calendar_today_outlined,
                             size: 11,
-                            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                            color: isDark
+                                ? AppColors.textMutedDark
+                                : AppColors.textMutedLight,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -1069,7 +1172,9 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w500,
-                              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                              color: isDark
+                                  ? AppColors.textMutedDark
+                                  : AppColors.textMutedLight,
                             ),
                           ),
                         ],
@@ -1079,7 +1184,6 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
             Divider(
               height: 1,
@@ -1087,7 +1191,6 @@ class DashboardScreen extends ConsumerWidget {
               color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
             ),
             const SizedBox(height: 8),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1103,7 +1206,8 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
                         color: isPaid
                             ? AppColors.success.withValues(alpha: 0.10)
@@ -1111,7 +1215,9 @@ class DashboardScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(
-                        isPaid ? 'PAID' : 'Due: ${currency.format(order.balanceDue)}',
+                        isPaid
+                            ? 'PAID'
+                            : 'Due: ${currency.format(order.balanceDue)}',
                         style: TextStyle(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
@@ -1131,8 +1237,10 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   // ─────────────── Helper Components ───────────────
-  Widget _buildGarmentThumbnail(OrderModel order, bool isDark, {bool isAlert = false}) {
-    final hasImage = order.sketchDataUrl != null && order.sketchDataUrl!.isNotEmpty;
+  Widget _buildGarmentThumbnail(OrderModel order, bool isDark,
+      {bool isAlert = false}) {
+    final hasImage =
+        order.sketchDataUrl != null && order.sketchDataUrl!.isNotEmpty;
 
     return Container(
       width: 50,
@@ -1149,8 +1257,10 @@ class DashboardScreen extends ConsumerWidget {
             ? CachedNetworkImage(
                 imageUrl: order.sketchDataUrl!,
                 fit: BoxFit.cover,
-                placeholder: (_, __) => _buildPlaceholderIcon(order, isDark, isAlert),
-                errorWidget: (_, __, ___) => _buildPlaceholderIcon(order, isDark, isAlert),
+                placeholder: (_, __) =>
+                    _buildPlaceholderIcon(order, isDark, isAlert),
+                errorWidget: (_, __, ___) =>
+                    _buildPlaceholderIcon(order, isDark, isAlert),
               )
             : _buildPlaceholderIcon(order, isDark, isAlert),
       ),
@@ -1173,7 +1283,8 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildWhatsAppButton(OrderModel order, dynamic user) {
     final hasPhone = order.customer != null &&
-        ((order.customer!.whatsapp != null && order.customer!.whatsapp!.isNotEmpty) ||
+        ((order.customer!.whatsapp != null &&
+                order.customer!.whatsapp!.isNotEmpty) ||
             order.customer!.mobile.isNotEmpty);
 
     return GestureDetector(
@@ -1184,11 +1295,15 @@ class DashboardScreen extends ConsumerWidget {
             ? order.customer!.whatsapp!
             : order.customer!.mobile;
         final shopName = user?.shopName ?? 'KTown Aari Works';
-        final itemNames = order.items.map((e) => e.productName ?? 'Bridal Aari Blouse').toList();
+        final itemNames = order.items
+            .map((e) => e.productName ?? 'Bridal Aari Blouse')
+            .toList();
         final msg = WhatsAppService.buildOrderMessage(
           status: order.status,
           customerName: order.customer?.name ?? 'Valued Client',
-          orderId: order.orderId.length > 8 ? order.orderId.substring(0, 8).toUpperCase() : order.orderId.toUpperCase(),
+          orderId: order.orderId.length > 8
+              ? order.orderId.substring(0, 8).toUpperCase()
+              : order.orderId.toUpperCase(),
           shopName: shopName,
           itemNames: itemNames.isNotEmpty ? itemNames : ['Bridal Aari Blouse'],
         );
@@ -1221,7 +1336,9 @@ class DashboardScreen extends ConsumerWidget {
 
   String _getGarmentSubtitle(OrderModel order) {
     if (order.items.isNotEmpty) {
-      return order.items.map((e) => e.productName ?? 'Bridal Aari Blouse').join(', ');
+      return order.items
+          .map((e) => e.productName ?? 'Bridal Aari Blouse')
+          .join(', ');
     }
     return 'Bridal Aari Blouse & Embroidery';
   }

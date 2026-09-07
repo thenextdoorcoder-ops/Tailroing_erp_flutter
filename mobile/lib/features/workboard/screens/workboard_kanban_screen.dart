@@ -545,7 +545,7 @@ class _WorkboardKanbanScreenState extends ConsumerState<WorkboardKanbanScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      order.customer?.name ?? 'Walk-in Client',
+                      order.customer?.name ?? 'Walk-in Customer',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -569,7 +569,7 @@ class _WorkboardKanbanScreenState extends ConsumerState<WorkboardKanbanScreen>
               if (order.customer?.mobile != null)
                 IconButton(
                   icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18, color: Color(0xFF25D366)),
-                  tooltip: 'WhatsApp Client',
+                  tooltip: 'WhatsApp Customer',
                   onPressed: () {
                     final msg = WhatsAppService.buildOrderMessage(
                       customerName: order.customer!.name,

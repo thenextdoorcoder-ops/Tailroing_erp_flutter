@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
+import '../../../shared/widgets/premium_snackbar.dart';
 import '../providers/customer_provider.dart';
 
 class CustomerFormScreen extends ConsumerStatefulWidget {
@@ -57,19 +57,15 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
     if (mounted) {
       setState(() => _isSaving = false);
       if (ok) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Customer registered successfully!'),
-            backgroundColor: AppColors.success,
-          ),
+        PremiumSnackbar.showSuccess(
+          context,
+          'Customer registered successfully! 🎉',
         );
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to save customer. Mobile might already exist.'),
-            backgroundColor: AppColors.error,
-          ),
+        PremiumSnackbar.showError(
+          context,
+          'Failed to save customer. Mobile might already exist.',
         );
       }
     }

@@ -9,10 +9,13 @@ import '../../../shared/models/order_model.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/loading_shimmer.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../core/storage/hive_service.dart';
 import '../../../shared/widgets/barcode_scanner_modal.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/animated_list_item.dart';
 import '../../../shared/widgets/payment_collection_modal.dart';
+import '../../../shared/widgets/bottom_sheet_handle.dart';
+import '../../dashboard/providers/dashboard_provider.dart';
 import '../providers/order_provider.dart';
 
 class OrdersListScreen extends ConsumerStatefulWidget {
@@ -66,6 +69,35 @@ class _OrdersListScreenState extends ConsumerState<OrdersListScreen>
     final ordersState = ref.watch(ordersListProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currencyFormatter = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
+
+    final dashboardData = ref.watch(dashboardProvider).value;
+    final cachedRaw = HiveService.getCachedOrders();
+    final allCachedOrders = cachedRaw != null
+        ? cachedRaw.map((e) => OrderModel.fromJson(Map<String, dynamic>.from(e))).toList()
+        : <OrderModel>[];
+
+    int getTabCount(String status) {
+      if (allCachedOrders.isNotEmpty) {
+        if (status == 'ALL') return allCachedOrders.length;
+        if (status == 'CUTTING_STARTED') {
+          return allCachedOrders.where((o) =>
+            o.status == 'ORDER_PLACED' ||
+            o.status == 'DESIGNING' ||
+            o.status == 'CUTTING_STARTED' ||
+            o.status == 'STITCHING_STARTED' ||
+            o.status == 'EMBROIDERY' ||
+            o.status == 'FINISHING').length;
+        }
+        return allCachedOrders.where((o) => o.status == status).length;
+      }
+      if (dashboardData != null) {
+        if (status == 'ALL') return dashboardData.activeOrdersCount;
+        if (status == 'CUTTING_STARTED') return dashboardData.activeOrdersCount;
+        if (status == 'READY_TO_DELIVER') return dashboardData.ordersByStage['READY_TO_DELIVER'] ?? 0;
+        if (status == 'DELIVERED') return dashboardData.ordersByStage['DELIVERED'] ?? 0;
+      }
+      return 0;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -161,10 +193,36 @@ class _OrdersListScreenState extends ConsumerState<OrdersListScreen>
                   unselectedLabelColor: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
                   unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                   tabs: _tabs.map((t) {
+                    final count = getTabCount(t['status']!);
                     return Tab(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Text(t['label']!),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(t['label']!),
+                            if (count > 0) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? Colors.white.withValues(alpha: 0.18)
+                                      : AppColors.primary.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  count > 99 ? '99+' : count.toString(),
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark ? Colors.white : AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -373,7 +431,7 @@ class _OrdersListScreenState extends ConsumerState<OrdersListScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      order.customer?.name ?? 'Walk-in Client',
+                      order.customer?.name ?? 'Walk-in Customer',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -396,7 +454,7 @@ class _OrdersListScreenState extends ConsumerState<OrdersListScreen>
               if (order.customer?.mobile != null)
                 IconButton(
                   icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18, color: Color(0xFF25D366)),
-                  tooltip: 'WhatsApp Client',
+                  tooltip: 'WhatsApp Customer',
                   onPressed: () {
                     final msg = WhatsAppService.buildOrderMessage(
                       customerName: order.customer!.name,
@@ -494,6 +552,7 @@ class _OrdersListScreenState extends ConsumerState<OrdersListScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const BottomSheetHandle(margin: EdgeInsets.only(bottom: 14)),
             const Text(
               'Filter Orders by Stage',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),

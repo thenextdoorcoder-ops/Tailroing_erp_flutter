@@ -2,7 +2,7 @@
 // Service Worker for PWA
 // ⚠️ IMPORTANT: Bump this version number every time you deploy new code.
 // This forces old caches to be cleared and users to get the new version.
-const CACHE_VERSION = 'build-1776236887684';
+const CACHE_VERSION = 'build-1788712366359';
 const CACHE_NAME = `tms-${CACHE_VERSION}`;
 
 const urlsToCache = [

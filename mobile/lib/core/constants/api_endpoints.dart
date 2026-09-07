@@ -37,6 +37,7 @@ class ApiEndpoints {
   static const String categories = '/categories';
   static const String subCategories = '/sub-categories';
   static const String products = '/products';
+  static String productDetail(String id) => '/products/$id';
   static const String addOns = '/add-ons';
 
   // Inventory

@@ -16,6 +16,9 @@ import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/sketch_pad_modal.dart';
 import '../../../shared/widgets/voice_note_widget.dart';
+import '../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/bottom_sheet_handle.dart';
+import '../../../shared/widgets/premium_snackbar.dart';
 import '../providers/order_provider.dart';
 
 class OrderDetailScreen extends ConsumerStatefulWidget {
@@ -92,11 +95,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
         .updateOrderStatus(widget.orderId, nextStatus);
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Order advanced to ${nextStatus.replaceAll('_', ' ')}'),
-          backgroundColor: AppColors.success,
-        ),
+      PremiumSnackbar.showSuccess(
+        context,
+        'Order advanced to ${nextStatus.replaceAll('_', ' ')}',
       );
       _fetchOrderDetail();
     }
@@ -131,17 +132,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+            const BottomSheetHandle(margin: EdgeInsets.only(bottom: 16)),
             Row(
               children: [
                 Container(
@@ -297,6 +288,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const BottomSheetHandle(margin: EdgeInsets.only(bottom: 14)),
               const Text(
                 'Record Payment',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
@@ -351,11 +343,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                       );
 
                   if (ok && mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Payment recorded successfully!'),
-                        backgroundColor: AppColors.success,
-                      ),
+                    PremiumSnackbar.showSuccess(
+                      context,
+                      'Payment recorded successfully!',
                     );
                     _fetchOrderDetail();
                   }
@@ -384,17 +374,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+            const BottomSheetHandle(margin: EdgeInsets.only(bottom: 16)),
             const Text(
               'Print & Export Options',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
@@ -482,9 +462,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
               onTap: () async {
                 Navigator.pop(ctx);
                 if (kIsWeb) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Bluetooth POS printing is supported on Android')),
-                  );
+                  PremiumSnackbar.showInfo(context, 'Bluetooth POS printing is supported on Android');
                   return;
                 }
                 if (!isBtConnected) {
@@ -496,12 +474,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   shopName: 'KTown Aari Works',
                 );
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(ok ? 'Receipt printed!' : 'Failed to print receipt'),
-                      backgroundColor: ok ? AppColors.success : AppColors.error,
-                    ),
-                  );
+                  if (ok) {
+                    PremiumSnackbar.showSuccess(context, 'Receipt printed successfully!');
+                  } else {
+                    PremiumSnackbar.showError(context, 'Failed to print receipt');
+                  }
                 }
               },
             ),
@@ -523,9 +500,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
               onTap: () async {
                 Navigator.pop(ctx);
                 if (kIsWeb) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Bluetooth tag printing is supported on Android')),
-                  );
+                  PremiumSnackbar.showInfo(context, 'Bluetooth tag printing is supported on Android');
                   return;
                 }
                 if (!isBtConnected) {
@@ -537,12 +512,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                   shopName: 'KTown Aari Works',
                 );
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(ok ? 'Garment tag printed!' : 'Failed to print tag'),
-                      backgroundColor: ok ? AppColors.success : AppColors.error,
-                    ),
-                  );
+                  if (ok) {
+                    PremiumSnackbar.showSuccess(context, 'Garment tag printed successfully!');
+                  } else {
+                    PremiumSnackbar.showError(context, 'Failed to print tag');
+                  }
                 }
               },
             ),
@@ -580,7 +554,18 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Order Details')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              LoadingShimmer(count: 1, height: 130),
+              SizedBox(height: 14),
+              LoadingShimmer(count: 1, height: 180),
+              SizedBox(height: 14),
+              LoadingShimmer(count: 3, height: 64),
+            ],
+          ),
+        ),
       );
     }
 
@@ -620,8 +605,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             onPressed: () async {
               final sketch = await SketchPadModal.show(context, initialSketchUrl: order.sketchDataUrl);
               if (sketch != null && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Sketch updated')),
+                PremiumSnackbar.showSuccess(
+                  context,
+                  'Design sketch updated successfully! 🎨',
                 );
               }
             },

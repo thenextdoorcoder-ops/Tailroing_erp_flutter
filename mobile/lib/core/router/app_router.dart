@@ -17,6 +17,7 @@ import '../../features/enquiries/screens/enquiries_screen.dart';
 import '../../features/gallery/screens/gallery_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/settings/screens/printer_settings_screen.dart';
+import '../../features/settings/screens/services_pricing_screen.dart';
 import '../../features/attenders/screens/attenders_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -127,6 +128,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/printer-settings',
         builder: (context, state) => const PrinterSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/services-pricing',
+        builder: (context, state) => const ServicesPricingScreen(),
       ),
       GoRoute(
         path: '/attenders',

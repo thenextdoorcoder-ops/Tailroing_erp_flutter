@@ -224,10 +224,11 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       orderingFor,
       sketchDataUrl,
       attenderId,
+      paymentMethod,
     } = req.body;
 
-    if (!customerId || !dueDate || !items || items.length === 0) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!customerId || !dueDate) {
+      return res.status(400).json({ error: 'Missing required fields: customer and due date are required' });
     }
 
     // --- HARDEN MULTI-TENANCY: Verify customer belongs to this user ---
@@ -240,9 +241,78 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     }
     // -----------------------------------------------------------------
 
+    // Prepare items, handling custom tailoring services if needed
+    let finalItems: any[] = (items && Array.isArray(items)) ? [...items] : [];
 
-    const productTotal = items.reduce(
-      (sum: number, item: any) => sum + item.rate * item.quantity,
+    // If items is empty, create or link a fallback custom tailoring product
+    if (finalItems.length === 0) {
+      let customProduct = await prisma.product.findFirst({
+        where: { userId: req.user!.ownerId, name: 'Custom Tailoring Service', deletedAt: null }
+      });
+      if (!customProduct) {
+        let defaultCategory = await prisma.category.findFirst({
+          where: { userId: req.user!.ownerId, deletedAt: null }
+        });
+        if (!defaultCategory) {
+          defaultCategory = await prisma.category.create({
+            data: {
+              name: 'Custom',
+              measurementType: 'BLOUSE',
+              userId: req.user!.ownerId,
+            }
+          });
+        }
+        customProduct = await prisma.product.create({
+          data: {
+            name: 'Custom Tailoring Service',
+            categoryId: defaultCategory.id,
+            sellingPrice: 0,
+            userId: req.user!.ownerId,
+          }
+        });
+      }
+      finalItems.push({
+        productId: customProduct.id,
+        quantity: 1,
+        rate: Number(req.body.productTotal || req.body.servicesTotal || 0),
+        total: Number(req.body.productTotal || req.body.servicesTotal || 0),
+      });
+    } else {
+      // Resolve any item with 'custom' or missing productId
+      for (const itm of finalItems) {
+        if (!itm.productId || itm.productId === 'custom') {
+          let customProduct = await prisma.product.findFirst({
+            where: { userId: req.user!.ownerId, name: 'Custom Tailoring Service', deletedAt: null }
+          });
+          if (!customProduct) {
+            let defaultCategory = await prisma.category.findFirst({
+              where: { userId: req.user!.ownerId, deletedAt: null }
+            });
+            if (!defaultCategory) {
+              defaultCategory = await prisma.category.create({
+                data: {
+                  name: 'Custom',
+                  measurementType: 'BLOUSE',
+                  userId: req.user!.ownerId,
+                }
+              });
+            }
+            customProduct = await prisma.product.create({
+              data: {
+                name: 'Custom Tailoring Service',
+                categoryId: defaultCategory.id,
+                sellingPrice: 0,
+                userId: req.user!.ownerId,
+              }
+            });
+          }
+          itm.productId = customProduct.id;
+        }
+      }
+    }
+
+    const productTotal = finalItems.reduce(
+      (sum: number, item: any) => sum + (Number(item.rate) || 0) * (Number(item.quantity) || 1),
       0
     );
 
@@ -287,11 +357,11 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         orderingFor: orderingFor ? sanitizeObject(orderingFor) : null,
         attenderId: attenderId || null,
         orderItems: {
-          create: items.map((item: any) => ({
+          create: finalItems.map((item: any) => ({
             productId: item.productId,
-            quantity: item.quantity,
-            rate: item.rate,
-            total: item.rate * item.quantity,
+            quantity: Number(item.quantity) || 1,
+            rate: Number(item.rate) || 0,
+            total: (Number(item.rate) || 0) * (Number(item.quantity) || 1),
           })),
         },
         ...(addOns && addOns.length > 0
@@ -343,6 +413,23 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         attender: true,
       },
     });
+
+    // 💰 Record advance payment in payments table if collected
+    if (advancePaid && Number(advancePaid) > 0) {
+      const validMethod = ['CASH', 'UPI', 'CARD', 'BANK_TRANSFER'].includes(paymentMethod)
+        ? paymentMethod
+        : 'CASH';
+      await prisma.payment.create({
+        data: {
+          orderId: order.id,
+          customerId,
+          userId: req.user!.ownerId,
+          amount: Number(advancePaid),
+          paymentMethod: validMethod as any,
+          notes: `Advance payment collected via ${validMethod} during order creation`,
+        },
+      });
+    }
 
     // 🔧 Link measurement to order AFTER order is created
     if (measurementId) {

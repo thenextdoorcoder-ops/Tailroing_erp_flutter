@@ -9,6 +9,8 @@ import '../../../shared/widgets/loading_shimmer.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
+import '../../../shared/widgets/bottom_sheet_handle.dart';
+import '../../../shared/widgets/premium_snackbar.dart';
 
 class ExpensesScreen extends ConsumerStatefulWidget {
   const ExpensesScreen({super.key});
@@ -79,6 +81,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const BottomSheetHandle(margin: EdgeInsets.only(bottom: 14)),
               const Text('Log Shop Expense', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(height: 14),
               CustomTextField(
@@ -130,6 +133,12 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                       'notes': notesController.text.trim(),
                       'date': DateTime.now().toIso8601String(),
                     });
+                    if (mounted) {
+                      PremiumSnackbar.showSuccess(
+                        context,
+                        'Expense of ₹${amt.toStringAsFixed(0)} recorded successfully! ✨',
+                      );
+                    }
                     _fetchExpenses();
                   } catch (_) {}
                 },

@@ -153,13 +153,20 @@ $RECYCLE.BIN/
 *~
 
 # ------------------------------------------
-# Logs
+# Logs & Databases
 # ------------------------------------------
 *.log
 logs/
+*.sqlite
+*.sqlite3
+*.db
 
 # ------------------------------------------
 # AI Assistants / Tooling metadata
 # ------------------------------------------
 .claude/
+.agents/
+agent/
+skills-lock.json
+implementation_plan.md
 
